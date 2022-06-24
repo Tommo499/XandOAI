@@ -1,6 +1,8 @@
-from math import sqrt
+from math import sqrt, log, e
+import random as r
 
 c = sqrt(2)
+simulations = 1
 datafolderprefix = "C:\\Users\\Thomas\\Documents\\XandOdata*.json"
 
 
@@ -28,27 +30,46 @@ def find_children(parentname):
     return children
 
 
+def getdata(node):
+    return fetchfromfile(datafolderprefix.replace('*', str(len(node))))[node]
+
+
 def getchilddata(parent):
     child_file = fetchfromfile(datafolderprefix.replace('*', str(len(parent)+1)))
+    return_dict = dict()
     for child in child_file:
         if not child.startswith(parent):
-            child_file.pop(child)
+            return_dict[child] = child_file[child]
     return child_file
 
 
-def choose_child(roundnum, parent):
+def keys_with_top_values(my_dict):
+    return [key for (key, value) in my_dict.items() if value == max(my_dict.values())]
+
+
+def choose_child(parent):
+    roundnum = len(parent) + 1
     boarddata = fetchfromfile(datafolderprefix.replace('*', str(roundnum)))
-    print(getchilddata('1'))
+    win_ratio = 0
+    best_child = dict()
+    choice_list = dict()
 
     for child in find_children(parent):
-        wins = 0
-        plays = 0
+        data = getdata(child)
+        wins = data['w']
+        plays = data['p']
+        templog = 0
         if plays == 0:
-            win_ratio = 0
+            choice_factor = 0
         else:
             win_ratio = wins / plays
+            templog = log(plays, e)
+            print(getdata(child))
+            choice_factor = win_ratio + c * sqrt(templog/(plays))  # might be the formula I found, but I probably broke it
+        choice_list[child] = choice_factor
 
-    return 0
+    best_child = r.choice(keys_with_top_values(choice_list))
 
+    return best_child
 
-choose_child(1, "")
+print(choose_child(''))
