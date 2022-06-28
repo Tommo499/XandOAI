@@ -1,8 +1,8 @@
 from math import sqrt, log, e
 import random as r
+import json
 
-c = sqrt(2)
-simulations = 1
+
 datafolderprefix = "C:\\Users\\Thomas\\Documents\\XandOdata*.json"
 
 
@@ -18,6 +18,12 @@ def fetch_json(j):  # converts json string to dictionary
 
 def fetchfromfile(filename):  # converts file with json string to dictionary
     with open(filename) as file:
+        return_value = fetch_json(file)
+    return return_value
+
+
+def fetchfromdata(number):
+    with open(f"C:\\Users\\Thomas\\Documents\\XandOdata{number}.json") as file:
         return_value = fetch_json(file)
     return return_value
 
@@ -38,9 +44,9 @@ def getchilddata(parent):
     child_file = fetchfromfile(datafolderprefix.replace('*', str(len(parent)+1)))
     return_dict = dict()
     for child in child_file:
-        if not child.startswith(parent):
+        if child.startswith(parent):
             return_dict[child] = child_file[child]
-    return child_file
+    return return_dict
 
 
 def keys_with_top_values(my_dict):
@@ -59,17 +65,40 @@ def choose_child(parent):
         wins = data['w']
         plays = data['p']
         templog = 0
-        if plays == 0:
-            choice_factor = 0
+        parent_visits = 0
+        if parent == '':  # if the parent is blank, use the number of simulations
+            parent_visits = json.load(open("C:\\Users\\Thomas\\Documents\\extra.json"))['simulations']
+        else:
+            parent_visits = getdata(parent)['p']
+        if plays == 0:  # sets the factor to 10 to guarentee every one is used at least once
+            choice_factor = 10
         else:
             win_ratio = wins / plays
-            templog = log(plays, e)
-            print(getdata(child))
-            choice_factor = win_ratio + c * sqrt(templog/(plays))  # might be the formula I found, but I probably broke it
+            templog = log(getdata(parent)['p'], e)
+            choice_factor = win_ratio + c * sqrt(templog/plays)
         choice_list[child] = choice_factor
 
     best_child = r.choice(keys_with_top_values(choice_list))
 
     return best_child
 
-print(choose_child(''))
+
+def have_turn(board_state: str, bot: bool):
+    if bot:
+        roundnum = len(board_state) + 1
+        return choose_child(board_state)
+    else:
+        turn = input('>>> ')
+        return turn
+
+
+def play_simulation():
+    first = r.choice([True, False])
+    if first:
+        pass
+
+
+c = sqrt(2)
+simulations = 1
+
+print(have_turn('1', True))
