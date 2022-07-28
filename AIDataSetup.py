@@ -13,7 +13,7 @@ def fully_contained(sub, container):
     return True
 
 
-def redundant(game):  # checks if the game could have been ended earlier, only for 
+def redundant(game):  # checks if the game could have been ended earlier, only for games that have 6 rounds played
     if len(game) >= 6:
         for segment in range(5, len(game) + 1):
             partgame = game[:segment]
