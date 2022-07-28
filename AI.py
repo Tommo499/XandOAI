@@ -11,7 +11,7 @@ prettyboard = f" 7 ███ 8 ███ 9\n" \
               f" 4 ███ 5 ███ 6\n" \
               f"███████████████\n" \
               f" 1 ███ 2 ███ 3\n"
-
+game = ''
 # constants for value algorithm
 c = sqrt(2)
 simulations = 1
@@ -112,22 +112,21 @@ def haveturn(board_state: str, bot: bool):
         if verifyturn(turn, board_state):
             returnvalue = board_state + turn
         else:
-            haveturn(board_state, bot)
+            returnvalue = haveturn(board_state, bot)
 
     return returnvalue
 
 
 def playsimulation():
-    global first, prettyboard
-    first = r.choice([False, True])  # True for the bot, false for humans
+    global first, prettyboard, game
+    first = r.choice([True, False])  # True for the bot, false for humans
     if first:
         print('You are O')
     else:
         print('You are X')
-    game = ''
-    won = ''
+    won = 0
     print(prettyboard)
-    while won == '' and len(game) < 9:
+    while won == 0 and len(game) < 9:
         game = haveturn(game, first)
         first = not first  # can be removed for zero or two player game
 
@@ -144,12 +143,15 @@ def playsimulation():
             prettyboard = prettyboard.replace(spot, 'O')
         print(prettyboard)
 
-    if won != '':
-        print(f'Player {won} won')
-    else:
-        print('Tie')
+    return won
 
-    # update(game)
+
+def playgame():
+    result = playsimulation()
+    if result != 0:
+        print(f"Player {result} won")
+    else:
+        print("Tie")
 
 
 def verifyturn(turn: str, state: str):
@@ -157,21 +159,3 @@ def verifyturn(turn: str, state: str):
         if turn not in state:
             return True
     return False
-
-
-def update(endgame: str):
-    botplays = []
-    for l in range(1, len(endgame) + 1, 2):
-        if (l + (not first)) <= len(endgame):
-            botplays.append(endgame[0:l + (not first)])
-
-    """
-    for slices in range(1 + (not first), len(endgame) + 1, 2):
-        wholefile = fetchfromdata(slices)
-        
-        wholefile[endgame[:slices]]['p'] += 1
-"""
-
-
-playsimulation()
-quit()
