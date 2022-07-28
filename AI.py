@@ -120,7 +120,6 @@ def haveturn(board_state: str, bot: bool):
 def playsimulation():
     global first, prettyboard
     first = r.choice([False, True])  # True for the bot, false for humans
-    playerpieces = {''}  # work out if which player is x or o
     if first:
         print('You are O')
     else:
