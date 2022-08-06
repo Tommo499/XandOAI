@@ -1,19 +1,23 @@
 from itertools import permutations
-import json
 import math
+import sqlite3 as sql
+from AI import *
+
+con = sql.connect('data.db')
+cur = con.cursor()
 
 winConditions = ('123', '456', '789', '147', '258', '369', '159', '357')
-# ↑ will be useful to make the redundancy checker
+# ↑ useful to make the redundancy checker
 
 
 def fully_contained(sub, container):
     for item in sub:
-        if not item in container:
+        if item not in container:
             return False
     return True
 
 
-def redundant(game):  # checks if the game could have been ended earlier, only for games that have 6 rounds played
+def redundant(game):  # checks if the game could have been ended earlier
     if len(game) >= 6:
         for segment in range(5, len(game) + 1):
             partgame = game[:segment]
@@ -28,19 +32,21 @@ def redundant(game):  # checks if the game could have been ended earlier, only f
 
 
 spots = '123456789'
-jsonList = []
-
-""" When uncommenting, replace the file path with your file path
-for leng in range(1,10):
-    jsonList = []
+writelist = []
+"""
+for leng in range(1, 10):
     for branch in permutations(spots, leng):
         if not redundant(branch):
-            temp = {''.join(branch): {'w': 0, 'p': 0}}
-            jsonList.append(json.dumps(temp))
-            del temp
-    json.dump(jsonList, open(f"C:\\Users\\Thomas\\Documents\\XandOdata{leng}.json", 'w'))
-    del jsonList
+            p1 = ''.join(sorted(list(branch[0::2])))
+            p2 = ''.join(sorted(list(branch[1::2])))
+            temp = (p1 + p2, 0, 0)
+            if temp not in writelist:
+                writelist.append(temp)
+
+cur.executemany("insert into data values (?, ?, ?)", writelist)
 
 
-temp = {'simulations': 1, "c": math.sqrt(2)}
+for row in cur.execute("select * from data where name = 7"):
+    print(row)
 """
+#con.commit() # Uncomment to save changes
