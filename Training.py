@@ -26,10 +26,10 @@ def train(rounds: int):
     results = dict()
     for n in range(rounds):
         results = dict()
-        result, gamestate = playsimulation()
+        result, gamestate = playsimulation(True)
         results[gamestate] = result
 
     writeresults(results)
     con.commit()
 
-train(5477)
+train(1000)

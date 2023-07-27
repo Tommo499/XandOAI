@@ -35,7 +35,7 @@ def writeFileToTable():
     upto = 0
     for row in data:
         upto += 1
-        print(upto)
+        print(f"{upto}/5477")  # I should make this dynamic but it will do for now
         row[1] = float(row[1])
         row[2] = int(row[2])
         cur.execute('INSERT INTO data VALUES (?, ?, ?)', tuple(row))
@@ -48,3 +48,4 @@ def writeFileToTable():
 # Make sure the database file is 'data.db' with a table called 'data'
 # Make sure 'data.txt' has one entry per row and the entries are separated by single spaces
 # An entry has the name first, the wins (float) then the plays (int)
+
