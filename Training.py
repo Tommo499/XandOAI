@@ -1,5 +1,7 @@
 from AI import *
+from math import ceil, floor
 
+spin = "-\|/"
 
 def writeresults(result_dict: dict):
     for state, result in result_dict.items():
@@ -25,6 +27,9 @@ def writeresults(result_dict: dict):
 def train(rounds: int):
     results = dict()
     for n in range(rounds):
+        print("\r" * (25 + len(str(rounds))), end="")
+        percentage = ceil(((n + 1)/rounds) * 20)
+        print(f"[{'%' * percentage}{'.' * (20 - percentage)}] {spin[ceil(n/10)%4]} {rounds}", end="")
         results = dict()
         result, gamestate = playsimulation(True)
         results[gamestate] = result

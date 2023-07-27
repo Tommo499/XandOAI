@@ -1,6 +1,7 @@
 # A small script which populates 'data.db' using the data in 'data.txt'
 # For some reason, when 'data.db' is downloaded, it erases all of the data
 # Thomas Wachmer 2022
+from math import ceil
 
 def writeTableToFile():
     import sqlite3 as sql
@@ -35,7 +36,10 @@ def writeFileToTable():
     upto = 0
     for row in data:
         upto += 1
-        print(f"{upto}/5477")  # I should make this dynamic but it will do for now
+        print("\r" * 27, end="")
+        percentage = ceil(((upto + 1)/5477) * 20)
+        print(f"[{'%' * percentage}{'.' * (20 - percentage)}] 5477", end="")
+        #print(f"{upto}/5477")  # I should make this dynamic but it will do for now
         row[1] = float(row[1])
         row[2] = int(row[2])
         cur.execute('INSERT INTO data VALUES (?, ?, ?)', tuple(row))
@@ -48,4 +52,4 @@ def writeFileToTable():
 # Make sure the database file is 'data.db' with a table called 'data'
 # Make sure 'data.txt' has one entry per row and the entries are separated by single spaces
 # An entry has the name first, the wins (float) then the plays (int)
-
+writeFileToTable()
