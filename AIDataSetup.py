@@ -33,7 +33,7 @@ def redundant(game):  # checks if the game could have been ended earlier
 
 spots = '123456789'
 writelist = []
-"""
+
 for leng in range(1, 10):
     for branch in permutations(spots, leng):
         if not redundant(branch):
@@ -45,8 +45,4 @@ for leng in range(1, 10):
 
 cur.executemany("insert into data values (?, ?, ?)", writelist)
 
-
-for row in cur.execute("select * from data where name = 7"):
-    print(row)
-"""
-#con.commit() # Uncomment to save changes
+con.commit() # Save the changes to the file
