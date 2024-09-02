@@ -1,7 +1,7 @@
 from AI import *
 from math import ceil, floor
 
-spin = "-\|/"
+spin = "-\\|/"
 
 def writeresults(result_dict: dict):
     for state, result in result_dict.items():
