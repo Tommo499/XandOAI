@@ -1,55 +1,57 @@
-# A small script which populates 'data.db' using the data in 'data.txt'
-# For some reason, when 'data.db' is downloaded, it erases all of the data
 # Thomas Wachmer 2022
 from math import ceil
+import sqlite3
 
-def writeTableToFile():
-    import sqlite3 as sql
-    con = sql.connect('data.db')
-    con.cursor()
-    data = []
-
-    table = con.execute('SELECT * FROM data')
-
-    for row in table:
-        data.append(row)
-
-    with open('data.txt', 'w') as file:
-        for line in data:
-            file.write(f'{int(line[0])} {line[1]} {line[2]}\n')
+def fully_contained(sub, container):
+    for item in sub:
+        if item not in container:
+            return False
+    return True
 
 
-def writeFileToTable():
-    import sqlite3
-    con = sqlite3.connect('data.db')
+def redundant(game):  # checks if the game could have been ended earlier
+    if len(game) >= 6:
+        for segment in range(5, len(game) + 1):
+            partgame = game[:segment]
+            player1 = ''.join(sorted(list(partgame[0::2])))
+            player2 = ''.join(sorted(list(partgame[1::2])))
+            for item in winConditions:
+                if fully_contained(item, player1) and segment < len(game):
+                    return True
+                elif fully_contained(item, player2) and segment < len(game):
+                    return True
+    return False
+
+if __name__ == "__main__":    
+    try:
+        con = sqlite3.connect('data.db')
+    except NameError:
+        with open("data.db", "x") as file:
+            pass
+        con = sqlite3.connect('data.db')
     cur = con.cursor()
-    cur.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='data';")
-    if len(cur.fetchone()) == 1:  # Check to see if table 'data' exists, if so, delete it
-        cur.execute('DROP TABLE data')
+    #cur.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='data';")
+    #if len(cur.fetchone()) == 1:  # Check to see if table 'data' exists, if so, delete it
+    #    cur.execute('DROP TABLE data')
+
+    # Going to assume the file is empty
     cur.execute("CREATE TABLE data (name text, wins real, plays integer)")
 
-    data = []
-    with open('data.txt', 'r') as file:
-        for line in file:
-            data.append((line[:-1].split(' ')))  # trim off newline and split by spaces
-    data = sorted(data, key=lambda row: len(row[0]))  # sort by first item in row
-    upto = 0
-    for row in data:
-        upto += 1
-        print("\r" * 27, end="")
-        percentage = ceil(((upto + 1)/5477) * 20)
-        print(f"[{'%' * percentage}{'.' * (20 - percentage)}] 5477", end="")
-        #print(f"{upto}/5477")  # I should make this dynamic but it will do for now
-        row[1] = float(row[1])
-        row[2] = int(row[2])
-        cur.execute('INSERT INTO data VALUES (?, ?, ?)', tuple(row))
+
+    spots = '123456789'
+    writelist = []
+
+    for leng in range(1, 10):
+        for branch in permutations(spots, leng): # Terribly inefficient but it will work for now
+            if not redundant(branch):
+                p1 = ''.join(sorted(list(branch[0::2])))
+                p2 = ''.join(sorted(list(branch[1::2])))
+                temp = (p1 + p2, 0, 0)
+                if temp not in writelist:
+                    writelist.append(temp)
+
+    cur.executemany("insert into data values (?, ?, ?)", writelist)
+
+
     con.commit()
 
-
-# Add function call below (writeFileToTable for filling out the database,
-# or writeTableToFile for backups or transfers)
-
-# Make sure the database file is 'data.db' with a table called 'data'
-# Make sure 'data.txt' has one entry per row and the entries are separated by single spaces
-# An entry has the name first, the wins (float) then the plays (int)
-writeFileToTable()
